@@ -257,9 +257,26 @@ export default function Home() {
             </div>
             
             <div>
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider">
-                Who was present?
-              </label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  Who was present?
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const allUserIds = trip.users.map(u => u.id);
+                    const allSelected = allUserIds.every(id => newExpense.attendeeIds.includes(id));
+                    
+                    setNewExpense(prev => ({
+                      ...prev,
+                      attendeeIds: allSelected ? [] : allUserIds
+                    }));
+                  }}
+                  className="px-3 py-1 text-xs bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-200"
+                >
+                  {trip.users.every(user => newExpense.attendeeIds.includes(user.id)) ? 'Deselect All' : 'Select All'}
+                </button>
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {trip.users.map(user => (
                   <label key={user.id} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
