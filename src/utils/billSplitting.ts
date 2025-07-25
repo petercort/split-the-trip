@@ -1,81 +1,159 @@
 import { Trip, Payment, User } from '@/types';
 
 /**
- * Calculates the minimum payments needed to settle all debts in a trip.
+ * Calculates payments needed to settle all debts in a trip.
  * 
- * This algorithm produces the most efficient solution with the minimum number
- * of transactions. Note that there can be multiple valid solutions to settle
- * the same debts - this algorithm prioritizes efficiency over other factors.
+ * This algorithm works by:
+ * 1. For each expense, calculating what each attendee owes the payer
+ * 2. Creating a running balance between each pair of users
+ * 3. Settling the net amounts between users
  */
 export function calculatePayments(trip: Trip): Payment[] {
-  // Calculate net balance for each user (what they paid - what they owe)
-  const balances = new Map<string, number>();
+  // Track what each person owes to each other person
+  const owesMatrix = new Map<string, Map<string, number>>();
   
-  // Initialize balances
+  // Initialize the matrix
   trip.users.forEach(user => {
-    balances.set(user.id, 0);
+    owesMatrix.set(user.id, new Map());
+    trip.users.forEach(otherUser => {
+      if (user.id !== otherUser.id) {
+        owesMatrix.get(user.id)!.set(otherUser.id, 0);
+      }
+    });
   });
   
   // Process each expense
   trip.expenses.forEach(expense => {
-    const sharePerPerson = expense.amount / expense.attendees.length;
+    const splitAmount = expense.amount / expense.attendees.length;
     
-    // Add what the payer paid
-    const currentPayerBalance = balances.get(expense.payer.id) || 0;
-    balances.set(expense.payer.id, currentPayerBalance + expense.amount);
-    
-    // Subtract what each attendee owes
+    // Each attendee (except the payer) owes the payer their share
     expense.attendees.forEach(attendee => {
-      const currentBalance = balances.get(attendee.id) || 0;
-      balances.set(attendee.id, currentBalance - sharePerPerson);
+      if (attendee.id !== expense.payer.id) {
+        const currentOwed = owesMatrix.get(attendee.id)!.get(expense.payer.id) || 0;
+        owesMatrix.get(attendee.id)!.set(expense.payer.id, currentOwed + splitAmount);
+      }
     });
   });
   
-  // Create lists of debtors and creditors
-  const debtors: { user: User; amount: number }[] = [];
-  const creditors: { user: User; amount: number }[] = [];
-  
-  balances.forEach((balance, userId) => {
-    const user = trip.users.find(u => u.id === userId);
-    if (!user) return;
-    
-    if (balance < -0.01) { // They owe money (small tolerance for floating point)
-      debtors.push({ user, amount: Math.abs(balance) });
-    } else if (balance > 0.01) { // They are owed money
-      creditors.push({ user, amount: balance });
-    }
-  });
-  
-  // Generate payments from debtors to creditors
+  // Calculate net amounts between each pair of users
   const payments: Payment[] = [];
   
-  // Sort to ensure consistent results
-  debtors.sort((a, b) => b.amount - a.amount);
-  creditors.sort((a, b) => b.amount - a.amount);
-  
-  let debtorIndex = 0;
-  let creditorIndex = 0;
-  
-  while (debtorIndex < debtors.length && creditorIndex < creditors.length) {
-    const debtor = debtors[debtorIndex];
-    const creditor = creditors[creditorIndex];
-    
-    const paymentAmount = Math.min(debtor.amount, creditor.amount);
-    
-    if (paymentAmount > 0.01) { // Only create payments for significant amounts
-      payments.push({
-        from: debtor.user,
-        to: creditor.user,
-        amount: Math.round(paymentAmount * 100) / 100 // Round to 2 decimal places
-      });
-    }
-    
-    debtor.amount -= paymentAmount;
-    creditor.amount -= paymentAmount;
-    
-    if (debtor.amount < 0.01) debtorIndex++;
-    if (creditor.amount < 0.01) creditorIndex++;
-  }
+  trip.users.forEach(userA => {
+    trip.users.forEach(userB => {
+      if (userA.id !== userB.id) {
+        const aOwesB = owesMatrix.get(userA.id)!.get(userB.id) || 0;
+        const bOwesA = owesMatrix.get(userB.id)!.get(userA.id) || 0;
+        
+        // Calculate the net amount
+        const netAmount = aOwesB - bOwesA;
+        
+        // If userA owes userB money (net positive), create a payment
+        if (netAmount > 0.01) {
+          payments.push({
+            from: userA,
+            to: userB,
+            amount: Math.round(netAmount * 100) / 100
+          });
+          
+          // Clear both directions to avoid duplicate payments
+          owesMatrix.get(userA.id)!.set(userB.id, 0);
+          owesMatrix.get(userB.id)!.set(userA.id, 0);
+        }
+      }
+    });
+  });
   
   return payments;
+}
+
+/**
+ * Debug function to show detailed balance calculations
+ * This helps verify that the algorithm is working correctly
+ */
+export function debugBalances(trip: Trip): {
+  expenseBreakdown: { expense: string; payer: string; attendees: string[]; splitAmount: number }[];
+  directDebts: { from: string; to: string; amount: number }[];
+  netPayments: { from: string; to: string; amount: number }[];
+} {
+  const expenseBreakdown: { expense: string; payer: string; attendees: string[]; splitAmount: number }[] = [];
+  const directDebts: { from: string; to: string; amount: number }[] = [];
+  
+  // Track what each person owes to each other person
+  const owesMatrix = new Map<string, Map<string, number>>();
+  
+  // Initialize the matrix
+  trip.users.forEach(user => {
+    owesMatrix.set(user.id, new Map());
+    trip.users.forEach(otherUser => {
+      if (user.id !== otherUser.id) {
+        owesMatrix.get(user.id)!.set(otherUser.id, 0);
+      }
+    });
+  });
+  
+  // Process each expense and track the breakdown
+  trip.expenses.forEach(expense => {
+    const splitAmount = expense.amount / expense.attendees.length;
+    
+    expenseBreakdown.push({
+      expense: expense.vendor,
+      payer: expense.payer.name,
+      attendees: expense.attendees.map(a => a.name),
+      splitAmount: Math.round(splitAmount * 100) / 100
+    });
+    
+    // Each attendee (except the payer) owes the payer their share
+    expense.attendees.forEach(attendee => {
+      if (attendee.id !== expense.payer.id) {
+        const currentOwed = owesMatrix.get(attendee.id)!.get(expense.payer.id) || 0;
+        owesMatrix.get(attendee.id)!.set(expense.payer.id, currentOwed + splitAmount);
+      }
+    });
+  });
+  
+  // Record all direct debts before netting
+  trip.users.forEach(userA => {
+    trip.users.forEach(userB => {
+      if (userA.id !== userB.id) {
+        const amount = owesMatrix.get(userA.id)!.get(userB.id) || 0;
+        if (amount > 0.01) {
+          directDebts.push({
+            from: userA.name,
+            to: userB.name,
+            amount: Math.round(amount * 100) / 100
+          });
+        }
+      }
+    });
+  });
+  
+  // Calculate net payments
+  const netPayments: { from: string; to: string; amount: number }[] = [];
+  
+  trip.users.forEach(userA => {
+    trip.users.forEach(userB => {
+      if (userA.id !== userB.id) {
+        const aOwesB = owesMatrix.get(userA.id)!.get(userB.id) || 0;
+        const bOwesA = owesMatrix.get(userB.id)!.get(userA.id) || 0;
+        
+        // Calculate the net amount
+        const netAmount = aOwesB - bOwesA;
+        
+        // If userA owes userB money (net positive), record it
+        if (netAmount > 0.01) {
+          netPayments.push({
+            from: userA.name,
+            to: userB.name,
+            amount: Math.round(netAmount * 100) / 100
+          });
+        }
+      }
+    });
+  });
+  
+  return {
+    expenseBreakdown,
+    directDebts,
+    netPayments
+  };
 }
