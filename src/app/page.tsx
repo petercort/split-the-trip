@@ -75,6 +75,63 @@ export default function Home() {
     setPayments(calculatedPayments);
   };
 
+  const loadExampleData = () => {
+    // Create users
+    const peter: User = { id: '1', name: 'peter' };
+    const john: User = { id: '2', name: 'john' };
+    const tim: User = { id: '3', name: 'tim' };
+
+    // Create expenses from the problem statement
+    const expenses: Expense[] = [
+      {
+        id: '1',
+        vendor: 'Pizza party',
+        amount: 20,
+        attendees: [peter, john],
+        payer: peter
+      },
+      {
+        id: '2', 
+        vendor: 'car rental',
+        amount: 60,
+        attendees: [peter, john, tim],
+        payer: tim
+      },
+      {
+        id: '3',
+        vendor: 'beer',
+        amount: 15,
+        attendees: [peter, john, tim],
+        payer: john
+      }
+    ];
+
+    setTrip({
+      id: '1',
+      name: 'Example Trip',
+      users: [peter, john, tim],
+      expenses
+    });
+
+    setPayments([]);
+  };
+
+  const clearData = () => {
+    setTrip({
+      id: '1',
+      name: 'My Trip',
+      users: [],
+      expenses: []
+    });
+    setPayments([]);
+    setNewExpense({
+      vendor: '',
+      amount: '',
+      attendeeIds: [],
+      payerId: ''
+    });
+  };
+
   const toggleAttendee = (userId: string) => {
     setNewExpense(prev => ({
       ...prev,
@@ -88,9 +145,23 @@ export default function Home() {
     <div className="min-h-screen p-8 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-8">Split the Bill</h1>
       
-      {/* Trip Name */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Trip: {trip.name}</h2>
+      {/* Trip Name and Demo Controls */}
+      <div className="mb-8 flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Trip: {trip.name}</h2>
+        <div className="flex gap-2">
+          <button
+            onClick={loadExampleData}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Load Example Data
+          </button>
+          <button
+            onClick={clearData}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          >
+            Clear All
+          </button>
+        </div>
       </div>
 
       {/* Add Users */}
@@ -253,6 +324,14 @@ export default function Home() {
                 ))}
               </tbody>
             </table>
+          </div>
+          
+          {/* Algorithm Note */}
+          <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400">
+            <p className="text-sm text-blue-800">
+              <strong>Note:</strong> This algorithm produces the most efficient solution with the minimum number of transactions. 
+              Multiple valid solutions exist that achieve the same final balances.
+            </p>
           </div>
         </div>
       )}
