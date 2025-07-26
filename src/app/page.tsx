@@ -21,6 +21,7 @@ export default function Home() {
   });
   
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [showBalanceDetails, setShowBalanceDetails] = useState(false);
 
   const addUser = () => {
     if (!newUserName.trim()) return;
@@ -373,103 +374,8 @@ export default function Home() {
         {/* Payment Results */}
         {payments.length > 0 && (
           <React.Fragment>
-            {/* Debug Information */}
-            <div className="bg-yellow-50 dark:bg-yellow-900 rounded-2xl shadow-xl border-2 border-yellow-200 dark:border-yellow-700 p-8 mb-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-                <h3 className="text-3xl font-bold text-yellow-800 dark:text-yellow-300">Balance Details</h3>
-              </div>
-              
-              {(() => {
-                const debug = debugBalances(trip);
-                return (
-                  <div className="grid gap-6">
-                    {/* Expense Breakdown */}
-                    <div>
-                      <h4 className="text-lg font-bold text-yellow-800 dark:text-yellow-300 mb-3">Expense Breakdown</h4>
-                      <div className="overflow-x-auto">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="border-b-2 border-yellow-300 dark:border-yellow-600">
-                              <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Expense</th>
-                              <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Payer</th>
-                              <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Attendees</th>
-                              <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Split Amount</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {debug.expenseBreakdown.map((item, index) => (
-                              <tr key={index} className="border-b border-yellow-100 dark:border-yellow-800">
-                                <td className="p-3 text-yellow-800 dark:text-yellow-200 font-semibold">{item.expense}</td>
-                                <td className="p-3 text-green-600 dark:text-green-400 font-bold">{item.payer}</td>
-                                <td className="p-3 text-yellow-700 dark:text-yellow-300">{item.attendees.join(', ')}</td>
-                                <td className="p-3 text-blue-600 dark:text-blue-400 font-bold">${item.splitAmount.toFixed(2)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-
-                    {/* Direct Debts */}
-                    <div>
-                      <h4 className="text-lg font-bold text-yellow-800 dark:text-yellow-300 mb-3">Direct Debts (Before Netting)</h4>
-                      <div className="overflow-x-auto">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="border-b-2 border-yellow-300 dark:border-yellow-600">
-                              <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">From</th>
-                              <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">To</th>
-                              <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Amount</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {debug.directDebts.map((item, index) => (
-                              <tr key={index} className="border-b border-yellow-100 dark:border-yellow-800">
-                                <td className="p-3 text-red-600 dark:text-red-400 font-semibold">{item.from}</td>
-                                <td className="p-3 text-green-600 dark:text-green-400 font-semibold">{item.to}</td>
-                                <td className="p-3 text-yellow-800 dark:text-yellow-200 font-bold">${item.amount.toFixed(2)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-
-                    {/* Net Payments */}
-                    <div>
-                      <h4 className="text-lg font-bold text-yellow-800 dark:text-yellow-300 mb-3">Net Payments (After Netting)</h4>
-                      <div className="overflow-x-auto">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="border-b-2 border-yellow-300 dark:border-yellow-600">
-                              <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">From</th>
-                              <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">To</th>
-                              <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Amount</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {debug.netPayments.map((item, index) => (
-                              <tr key={index} className="border-b border-yellow-100 dark:border-yellow-800">
-                                <td className="p-3 text-red-600 dark:text-red-400 font-bold">{item.from}</td>
-                                <td className="p-3 text-green-600 dark:text-green-400 font-bold">{item.to}</td>
-                                <td className="p-3 text-yellow-800 dark:text-yellow-200 font-bold text-lg">${item.amount.toFixed(2)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-
-            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-700 rounded-2xl shadow-2xl border-2 border-emerald-200 dark:border-slate-600 p-8">
+            {/* Payment Summary - Show First */}
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-700 rounded-2xl shadow-2xl border-2 border-emerald-200 dark:border-slate-600 p-8 mb-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -518,14 +424,126 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-blue-800 dark:text-blue-300 mb-2">How it works</h4>
-                    <p className="text-blue-700 dark:text-blue-200 leading-relaxed">
-                      This updated algorithm ensures everyone gets paid exactly what they&apos;re owed by calculating precise balances and creating direct payments between debtors and creditors.
-                    </p>
-                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* Balance Details - Expandable Section */}
+            <div className="bg-yellow-50 dark:bg-yellow-900 rounded-2xl shadow-xl border-2 border-yellow-200 dark:border-yellow-700 mb-8">
+              <button
+                onClick={() => setShowBalanceDetails(!showBalanceDetails)}
+                className="w-full p-6 flex items-center justify-between hover:bg-yellow-100 dark:hover:bg-yellow-800 transition-colors rounded-2xl"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-yellow-800 dark:text-yellow-300">Balance Details & Calculations</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-yellow-700 dark:text-yellow-400 font-medium">
+                    {showBalanceDetails ? 'Hide' : 'Show'} Details
+                  </span>
+                  <svg 
+                    className={`w-5 h-5 text-yellow-700 dark:text-yellow-400 transition-transform duration-200 ${showBalanceDetails ? 'rotate-180' : ''}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+              
+              {showBalanceDetails && (
+                <div className="px-8 pb-8">
+                  {(() => {
+                    const debug = debugBalances(trip);
+                    return (
+                      <div className="grid gap-6">
+                        {/* Expense Breakdown */}
+                        <div>
+                          <h4 className="text-lg font-bold text-yellow-800 dark:text-yellow-300 mb-3">Expense Breakdown</h4>
+                          <div className="overflow-x-auto">
+                            <table className="w-full">
+                              <thead>
+                                <tr className="border-b-2 border-yellow-300 dark:border-yellow-600">
+                                  <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Expense</th>
+                                  <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Payer</th>
+                                  <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Attendees</th>
+                                  <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Split Amount</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {debug.expenseBreakdown.map((item, index) => (
+                                  <tr key={index} className="border-b border-yellow-100 dark:border-yellow-800">
+                                    <td className="p-3 text-yellow-800 dark:text-yellow-200 font-semibold">{item.expense}</td>
+                                    <td className="p-3 text-green-600 dark:text-green-400 font-bold">{item.payer}</td>
+                                    <td className="p-3 text-yellow-700 dark:text-yellow-300">{item.attendees.join(', ')}</td>
+                                    <td className="p-3 text-blue-600 dark:text-blue-400 font-bold">${item.splitAmount.toFixed(2)}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+
+                        {/* Direct Debts */}
+                        <div>
+                          <h4 className="text-lg font-bold text-yellow-800 dark:text-yellow-300 mb-3">Direct Debts (Before Netting)</h4>
+                          <div className="overflow-x-auto">
+                            <table className="w-full">
+                              <thead>
+                                <tr className="border-b-2 border-yellow-300 dark:border-yellow-600">
+                                  <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">From</th>
+                                  <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">To</th>
+                                  <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Amount</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {debug.directDebts.map((item, index) => (
+                                  <tr key={index} className="border-b border-yellow-100 dark:border-yellow-800">
+                                    <td className="p-3 text-red-600 dark:text-red-400 font-semibold">{item.from}</td>
+                                    <td className="p-3 text-green-600 dark:text-green-400 font-semibold">{item.to}</td>
+                                    <td className="p-3 text-yellow-800 dark:text-yellow-200 font-bold">${item.amount.toFixed(2)}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+
+                        {/* Net Payments */}
+                        <div>
+                          <h4 className="text-lg font-bold text-yellow-800 dark:text-yellow-300 mb-3">Net Payments (After Netting)</h4>
+                          <div className="overflow-x-auto">
+                            <table className="w-full">
+                              <thead>
+                                <tr className="border-b-2 border-yellow-300 dark:border-yellow-600">
+                                  <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">From</th>
+                                  <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">To</th>
+                                  <th className="text-left p-3 text-yellow-700 dark:text-yellow-300 font-bold text-sm">Amount</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {debug.netPayments.map((item, index) => (
+                                  <tr key={index} className="border-b border-yellow-100 dark:border-yellow-800">
+                                    <td className="p-3 text-red-600 dark:text-red-400 font-bold">{item.from}</td>
+                                    <td className="p-3 text-green-600 dark:text-green-400 font-bold">{item.to}</td>
+                                    <td className="p-3 text-yellow-800 dark:text-yellow-200 font-bold text-lg">${item.amount.toFixed(2)}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
           </React.Fragment>
         )}
