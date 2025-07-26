@@ -1,6 +1,6 @@
 # Split the Bill
 
-A web application for splitting bills among friends during trips.
+A web application for splitting expenses among friends during trips.
 
 ## Features
 
@@ -9,12 +9,8 @@ A web application for splitting bills among friends during trips.
 - Automatically calculate who owes whom how much
 - Generate payment summary tables
 
-## Getting Started
+## Usage
 
-First, run the development server:
+Nav to the [pages deployment](https://petercort.github.io/split-the-trip/) and enjoy!
 
-```bash
-npm run dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
