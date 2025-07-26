@@ -157,3 +157,44 @@ export function debugBalances(trip: Trip): {
     netPayments
   };
 }
+
+/**
+ * Generates CSV content for payment summary download
+ */
+export function generatePaymentSummaryCSV(payments: Payment[], tripName: string): string {
+  const headers = ['From', 'To', 'Amount'];
+  const rows = payments.map(payment => [
+    payment.from.name,
+    payment.to.name,
+    `$${payment.amount.toFixed(2)}`
+  ]);
+  
+  const csvContent = [
+    `Payment Summary for ${tripName}`,
+    `Generated on ${new Date().toLocaleDateString()}`,
+    '',
+    headers.join(','),
+    ...rows.map(row => row.join(','))
+  ].join('\n');
+  
+  return csvContent;
+}
+
+/**
+ * Triggers download of payment summary as CSV file
+ */
+export function downloadPaymentSummary(payments: Payment[], tripName: string): void {
+  const csvContent = generatePaymentSummaryCSV(payments, tripName);
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${tripName.replace(/\s+/g, '_')}_payment_summary.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+}

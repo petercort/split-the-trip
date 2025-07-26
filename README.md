@@ -1,6 +1,6 @@
-# Split the Bill
+# Split the Trip
 
-A web application for splitting bills among friends during trips.
+A web application for splitting expenses among friends during trips.
 
 ## Features
 
