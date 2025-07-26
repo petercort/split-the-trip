@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import Home from '../page';
@@ -196,7 +196,7 @@ describe('Home Component', () => {
       
       // Form should be cleared
       expect(vendorInput).toHaveValue('');
-      expect(amountInput.value).toBe(''); // Check the value property directly for number inputs
+      expect((amountInput as HTMLInputElement).value).toBe(''); // Check the value property directly for number inputs
       expect(peterCheckbox).not.toBeChecked();
       expect(payerSelect).toHaveValue('');
     });

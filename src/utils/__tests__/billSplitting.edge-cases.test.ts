@@ -149,7 +149,6 @@ describe('Bill Splitting Edge Cases and Error Scenarios', () => {
       const trip: Trip = { id: '1', name: 'Accumulation Test', users, expenses };
       
       const payments = calculatePayments(trip);
-      const debug = debugBalances(trip);
       
       // Verify that total input equals total output (within rounding tolerance)
       const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
@@ -239,7 +238,7 @@ describe('Bill Splitting Edge Cases and Error Scenarios', () => {
       };
       
       // Add additional properties to test deep cloning behavior
-      (trip as any).metadata = { nested: { deep: { value: 'test' } } };
+      (trip as Trip & { metadata: { nested: { deep: { value: string } } } }).metadata = { nested: { deep: { value: 'test' } } };
       
       expect(() => calculatePayments(trip)).not.toThrow();
     });
@@ -259,14 +258,14 @@ describe('Bill Splitting Edge Cases and Error Scenarios', () => {
 
     it('should handle null and undefined values', () => {
       const users = [createUser('1', 'A'), createUser('2', 'B')];
-      const tripWithNulls: any = {
+      const tripWithNulls: Trip & { expenses: Array<Expense & { vendor: null }> } = {
         id: '1',
         name: 'Null Test',
         users,
         expenses: [
           {
             id: '1',
-            vendor: null,
+            vendor: null as unknown as string, // Intentionally testing null values
             amount: 20,
             attendees: users,
             payer: users[0]

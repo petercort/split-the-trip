@@ -298,7 +298,7 @@ describe('Bill Splitting Integration Tests', () => {
 
       // Form should be reset after loading example data
       expect(vendorInput).toHaveValue('');
-      expect(amountInput.value).toBe(''); // Check value property directly for number inputs
+      expect((amountInput as HTMLInputElement).value).toBe(''); // Check value property directly for number inputs
     });
   });
 });

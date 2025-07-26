@@ -1,5 +1,5 @@
 import { calculatePayments, debugBalances } from '../billSplitting';
-import { Trip, User, Expense, Payment } from '@/types';
+import { Trip, User, Expense } from '@/types';
 
 describe('Bill Splitting Utilities', () => {
   // Test data setup
@@ -474,7 +474,7 @@ describe('Bill Splitting Utilities', () => {
       }));
 
       // Sort both arrays for comparison
-      const sortPayments = (a: any, b: any) => {
+      const sortPayments = (a: { from: string; to: string; amount: number }, b: { from: string; to: string; amount: number }) => {
         if (a.from !== b.from) return a.from.localeCompare(b.from);
         if (a.to !== b.to) return a.to.localeCompare(b.to);
         return a.amount - b.amount;
