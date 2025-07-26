@@ -115,6 +115,14 @@ export default function Home() {
     });
 
     setPayments([]);
+    
+    // Clear the expense form when loading example data
+    setNewExpense({
+      vendor: '',
+      amount: '',
+      attendeeIds: [],
+      payerId: ''
+    });
   };
 
   const clearData = () => {
@@ -461,6 +469,11 @@ export default function Home() {
                 <div className="px-8 pb-8">
                   {(() => {
                     const debug = debugBalances(trip);
+                    // Add null checks to prevent undefined errors
+                    if (!debug || !debug.expenseBreakdown || !debug.directDebts || !debug.netPayments) {
+                      return <div className="text-yellow-800 dark:text-yellow-300">No debug data available</div>;
+                    }
+                    
                     return (
                       <div className="grid gap-6">
                         {/* Expense Breakdown */}
