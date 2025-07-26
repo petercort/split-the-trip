@@ -344,7 +344,7 @@ export default function Home() {
                   <tr className="border-b-2 border-slate-200 dark:border-slate-600">
                     <th className="text-left p-4 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-sm">Vendor</th>
                     <th className="text-left p-4 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-sm">Cost</th>
-                    <th className="text-left p-4 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-sm">Users Present</th>
+                    <th className="text-left p-4 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-sm">People Present</th>
                     <th className="text-left p-4 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-sm">Who Paid</th>
                   </tr>
                 </thead>
