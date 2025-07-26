@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Trip, User, Expense, Payment } from '@/types';
-import { calculatePayments, debugBalances } from '@/utils/billSplitting';
+import { calculatePayments, debugBalances, downloadPaymentSummary } from '@/utils/billSplitting';
 
 export default function Home() {
   const [trip, setTrip] = useState<Trip>({
@@ -22,6 +22,8 @@ export default function Home() {
   
   const [payments, setPayments] = useState<Payment[]>([]);
   const [showBalanceDetails, setShowBalanceDetails] = useState(false);
+  const [isEditingTripName, setIsEditingTripName] = useState(false);
+  const [tempTripName, setTempTripName] = useState('');
 
   const addUser = () => {
     if (!newUserName.trim()) return;
@@ -150,13 +152,33 @@ export default function Home() {
     }));
   };
 
+  const saveTripName = () => {
+    if (tempTripName.trim()) {
+      setTrip(prev => ({
+        ...prev,
+        name: tempTripName.trim()
+      }));
+    }
+    setIsEditingTripName(false);
+  };
+
+  const cancelEditTripName = () => {
+    setTempTripName('');
+    setIsEditingTripName(false);
+  };
+
+  const startEditingTripName = () => {
+    setTempTripName(trip.name);
+    setIsEditingTripName(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="max-w-5xl mx-auto p-6 sm:p-8">
         {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Split the Bill
+            Split the Trip
           </h1>
           <p className="text-slate-600 dark:text-slate-400 text-lg">
             Easily split expenses and calculate payments for your group&apos;s trip
@@ -166,9 +188,35 @@ export default function Home() {
         {/* Trip Name and Demo Controls */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-6 mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
-              Trip: <span className="text-blue-600 dark:text-blue-400">{trip.name}</span>
-            </h2>
+            <div className="flex-1">
+              {isEditingTripName ? (
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={tempTripName}
+                    onChange={(e) => setTempTripName(e.target.value)}
+                    className="flex-1 p-4 border-2 border-blue-300 rounded-xl focus:border-blue-500 focus:ring-0 bg-white dark:bg-slate-700 text-slate-800 dark:text-white placeholder-slate-500 text-lg font-medium transition-colors"
+                    onKeyPress={(e) => e.key === 'Enter' && saveTripName()}
+                  />
+                  <button
+                    onClick={saveTripName}
+                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={cancelEditTripName}
+                    className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-xl hover:from-red-600 hover:to-red-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white cursor-pointer" onClick={startEditingTripName}>
+                  Trip: <span className="text-blue-600 dark:text-blue-400">{trip.name}</span>
+                </h2>
+              )}
+            </div>
             <div className="flex gap-3">
               <button
                 onClick={loadExampleData}
@@ -424,15 +472,17 @@ export default function Home() {
                 </table>
               </div>
               
-              {/* Algorithm Note */}
-              <div className="bg-blue-50 dark:bg-slate-700 border-l-4 border-blue-400 dark:border-blue-500 p-6 rounded-r-xl">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                </div>
+              {/* Download Button */}
+              <div className="flex justify-center mb-6">
+                <button
+                  onClick={() => downloadPaymentSummary(payments, trip.name)}
+                  className="px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold rounded-xl hover:from-teal-600 hover:to-emerald-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download Payment Summary
+                </button>
               </div>
             </div>
 
