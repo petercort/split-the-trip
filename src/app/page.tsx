@@ -150,7 +150,7 @@ export default function Home() {
             Split the Bill
           </h1>
           <p className="text-slate-600 dark:text-slate-400 text-lg">
-            Easily split expenses and calculate payments for your group
+            Easily split expenses and calculate payments for your group&apos;s trip
           </p>
         </div>
         
@@ -521,7 +521,7 @@ export default function Home() {
                   <div>
                     <h4 className="font-bold text-blue-800 dark:text-blue-300 mb-2">How it works</h4>
                     <p className="text-blue-700 dark:text-blue-200 leading-relaxed">
-                      This updated algorithm ensures everyone gets paid exactly what they're owed by calculating precise balances and creating direct payments between debtors and creditors.
+                      This updated algorithm ensures everyone gets paid exactly what they&apos;re owed by calculating precise balances and creating direct payments between debtors and creditors.
                     </p>
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-import { Trip, Payment, User } from '@/types';
+import { Trip, Payment } from '@/types';
 
 /**
  * Calculates payments needed to settle all debts in a trip.
