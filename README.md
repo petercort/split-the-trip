@@ -1,6 +1,6 @@
 # Split the Trip
 
-A web application for splitting expenses among friends during trips.
+A simple web app for splitting expenses during trips.
 
 ## Features
 
