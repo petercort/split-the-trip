@@ -1,6 +1,6 @@
 # Split the Trip
 
-A web application for splitting expenses among friends during trips.
+A simple web app for splitting expenses during trips.
 
 ## Features
 
@@ -12,5 +12,3 @@ A web application for splitting expenses among friends during trips.
 ## Usage
 
 Nav to the [pages deployment](https://petercort.github.io/split-the-trip/) and enjoy!
-
-
