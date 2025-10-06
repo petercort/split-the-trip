@@ -174,16 +174,16 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      <div className="max-w-5xl mx-auto p-6 sm:p-8">
+      <main className="max-w-5xl mx-auto p-6 sm:p-8">
         {/* Header */}
-        <div className="text-center mb-10">
+        <header className="text-center mb-10">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
             Split the Trip
           </h1>
           <p className="text-slate-600 dark:text-slate-400 text-lg">
             Easily split expenses and calculate payments for your group&apos;s trip
           </p>
-        </div>
+        </header>
         
         {/* Trip Name and Demo Controls */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-6 mb-8">
@@ -191,12 +191,17 @@ export default function Home() {
             <div className="flex-1">
               {isEditingTripName ? (
                 <div className="flex gap-3">
+                  <label htmlFor="trip-name-edit" className="sr-only">
+                    Edit trip name
+                  </label>
                   <input
+                    id="trip-name-edit"
                     type="text"
                     value={tempTripName}
                     onChange={(e) => setTempTripName(e.target.value)}
                     className="flex-1 p-4 border-2 border-blue-300 rounded-xl focus:border-blue-500 focus:ring-0 bg-white dark:bg-slate-700 text-slate-800 dark:text-white placeholder-slate-500 text-lg font-medium transition-colors"
                     onKeyPress={(e) => e.key === 'Enter' && saveTripName()}
+                    aria-label="Edit trip name"
                   />
                   <button
                     onClick={saveTripName}
@@ -212,9 +217,13 @@ export default function Home() {
                   </button>
                 </div>
               ) : (
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-white cursor-pointer" onClick={startEditingTripName}>
+                <button 
+                  className="text-2xl font-bold text-slate-800 dark:text-white text-left bg-transparent border-none p-0 cursor-pointer hover:opacity-80 transition-opacity" 
+                  onClick={startEditingTripName}
+                  aria-label="Click to edit trip name"
+                >
                   Trip: <span className="text-blue-600 dark:text-blue-400">{trip.name}</span>
-                </h2>
+                </button>
               )}
             </div>
             <div className="flex gap-3">
@@ -242,11 +251,15 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-slate-800 dark:text-white">Add Participants</h3>
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Add Participants</h2>
           </div>
           
           <div className="flex gap-3 mb-6">
+            <label htmlFor="participant-name" className="sr-only">
+              Enter participant name
+            </label>
             <input
+              id="participant-name"
               type="text"
               value={newUserName}
               onChange={(e) => setNewUserName(e.target.value)}
@@ -282,15 +295,16 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-slate-800 dark:text-white">Add Expense</h3>
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Add Expense</h2>
           </div>
           
           <div className="grid gap-6">
             <div>
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
+              <label htmlFor="expense-vendor" className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
                 Vendor
               </label>
               <input
+                id="expense-vendor"
                 type="text"
                 value={newExpense.vendor}
                 onChange={(e) => setNewExpense(prev => ({ ...prev, vendor: e.target.value }))}
@@ -300,10 +314,11 @@ export default function Home() {
             </div>
             
             <div>
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
+              <label htmlFor="expense-amount" className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
                 Amount ($)
               </label>
               <input
+                id="expense-amount"
                 type="number"
                 step="0.01"
                 value={newExpense.amount}
@@ -350,10 +365,11 @@ export default function Home() {
             </div>
             
             <div>
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
+              <label htmlFor="expense-payer" className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
                 Who paid?
               </label>
               <select
+                id="expense-payer"
                 value={newExpense.payerId}
                 onChange={(e) => setNewExpense(prev => ({ ...prev, payerId: e.target.value }))}
                 className="w-full p-4 border-2 border-slate-300 dark:border-slate-600 rounded-xl focus:border-purple-500 focus:ring-0 bg-white dark:bg-slate-700 text-slate-800 dark:text-white text-lg transition-colors"
@@ -383,7 +399,7 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-slate-800 dark:text-white">Expenses</h3>
+              <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Expenses</h2>
             </div>
             
             <div className="overflow-x-auto">
@@ -438,7 +454,7 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-3xl font-bold text-emerald-800 dark:text-emerald-300">Payment Summary</h3>
+                <h2 className="text-3xl font-bold text-emerald-800 dark:text-emerald-300">Payment Summary</h2>
               </div>
               
               <div className="overflow-x-auto mb-6">
@@ -498,7 +514,7 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold text-yellow-800 dark:text-yellow-300">Balance Details & Calculations</h3>
+                  <h2 className="text-2xl font-bold text-yellow-800 dark:text-yellow-300">Balance Details & Calculations</h2>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-yellow-700 dark:text-yellow-400 font-medium">
@@ -610,7 +626,7 @@ export default function Home() {
             </div>
           </React.Fragment>
         )}
-      </div>
+      </main>
     </div>
   );
 }
