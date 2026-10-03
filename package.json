@@ -33,6 +33,6 @@
     "jest": "^30.0.5",
     "jest-environment-jsdom": "^30.0.5",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^7"
   }
 }
